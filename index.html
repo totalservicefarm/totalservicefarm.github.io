@@ -153,7 +153,17 @@ function tocar(notas) {
 }
 function somAcerto() { tocar([523.25, 659.25, 783.99, 1046.5].flatMap((f, i) => [{ f, t: i * .08, d: .42, tipo: 'triangle', vol: .55 }, { f: f * 2, t: i * .08, d: .25, tipo: 'sine', vol: .18 }])) }
 function somErro() { tocar([{ f: 311.13, t: 0, d: .22, tipo: 'square', vol: .22 }, { f: 233.08, t: .2, d: .38, tipo: 'square', vol: .22 }]) }
-function vibrar(p) { if (!somOn) return; try { if (navigator.vibrate) navigator.vibrate(p) } catch (e) {} }
+// iPhone (iOS 18+): sem navigator.vibrate; um interruptor (<input switch>) acionado dá o "haptic" do sistema.
+function toqueIOS() {
+  try { const l = document.createElement('label'); l.setAttribute('aria-hidden', 'true'); l.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden'
+        const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1
+        l.appendChild(i); document.body.appendChild(l); l.click(); document.body.removeChild(l) } catch (e) {}
+}
+function vibrar(p) {
+  if (!somOn) return
+  try { if (typeof navigator.vibrate === 'function') { navigator.vibrate(p); return }
+        const n = Array.isArray(p) ? Math.ceil(p.length / 2) : 1; toqueIOS(); for (let k = 1; k < n; k++) setTimeout(toqueIOS, k * 220) } catch (e) {}
+}
 const vibrarAcerto = () => vibrar(60), vibrarErro = () => vibrar([140, 70, 140])
 const ICONE_SOM = (on) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor"/>${on ? '<path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>' : '<path d="m16 9 5 6m0-6-5 6"/>'}</svg>`
 const btnSom = document.getElementById('som')
@@ -246,7 +256,7 @@ function pergunta() {
     destravar()
     const certo = estado.escolha === q.c
     estado.respondida = true; estado.respostas[i] = certo; estado.efeito = certo ? 'acerto' : 'erro'
-    if (certo) { somAcerto(); vibrarAcerto() } else { somErro(); vibrarErro() }
+    if (certo) { somAcerto(); vibrarAcerto() } else { vibrarErro() } // erro: só vibração + tremor (sem som)
     render()
   }
   const n = document.getElementById('proxima')
