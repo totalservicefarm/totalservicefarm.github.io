@@ -125,11 +125,31 @@ const PERGUNTAS = [
     o: { A: 'Apenas a temperatura programada.', B: 'Temperatura da massa, horas em desvio, umidade, perdas e desempenho no campo.', C: 'Somente as toneladas armazenadas.' }, c: 'B',
     f: 'A temperatura programada é só a meta. Temperatura da massa, horas fora da faixa, umidade, perdas e o resultado no campo mostram o que realmente aconteceu.',
     m: { foto: 'jogo/p5.jpg' } },
+  { p: 'Uma batata-semente retirada da câmara fria ainda apresenta dormência. O que pode acontecer se ela for plantada nessas condições?',
+    o: { A: 'Emergência mais rápida e uniforme.', B: 'Atraso na emergência e possível desuniformidade da lavoura.', C: 'Aumento garantido do número de hastes por planta.' }, c: 'B',
+    f: 'A dormência pode atrasar ou dificultar a brotação, comprometendo a uniformidade da emergência.',
+    m: { foto: 'jogo/p6.jpg' } },
+  { p: 'Por que a formação de água condensada sobre os tubérculos durante o armazenamento é preocupante?',
+    o: { A: 'Porque pode favorecer o desenvolvimento de podridões.', B: 'Porque provoca imediatamente a quebra de dormência.', C: 'Porque aumenta a quantidade de matéria seca da semente.' }, c: 'A',
+    f: 'A presença de água livre na superfície dos tubérculos pode favorecer determinados agentes de podridão e aumentar os riscos sanitários.',
+    m: { foto: 'jogo/p7.jpg' } },
+  { p: 'Qual característica da batata-semente pode indicar dominância apical?',
+    o: { A: 'Todos os olhos apresentam brotos com desenvolvimento semelhante.', B: 'O tubérculo apresenta ausência completa de gemas.', C: 'Um ou poucos brotos apicais predominam sobre os demais.' }, c: 'C',
+    f: 'Na dominância apical, os brotos da região apical apresentam crescimento preferencial, podendo inibir temporariamente o desenvolvimento de outros olhos.',
+    m: { foto: 'jogo/p8.jpg' } },
+  { p: 'Dois lotes da mesma cultivar apresentam boa sanidade. O lote A tem brotação jovem e vigorosa; o lote B está fisiologicamente mais envelhecido. Qual afirmação é tecnicamente mais correta?',
+    o: { A: 'O lote B sempre produzirá mais, porque está fisiologicamente mais avançado.', B: 'A idade fisiológica pode alterar o número de hastes, a tuberização e a distribuição dos tamanhos dos tubérculos.', C: 'A idade fisiológica não influencia o desenvolvimento após a emergência.' }, c: 'B',
+    f: 'A idade fisiológica influencia o padrão de brotação, o número de hastes e a dinâmica de tuberização. Seus efeitos sobre produtividade e classificação dependem também da cultivar e das condições de cultivo.',
+    m: { foto: 'jogo/p9.jpg' } },
+  { p: 'Uma câmara fria apresenta temperatura e umidade dentro das faixas estabelecidas, mas registra acúmulo de CO₂. Qual é a interpretação mais adequada?',
+    o: { A: 'O CO₂ elevado demonstra que a conservação está ideal.', B: 'O CO₂ não precisa ser monitorado quando a temperatura está controlada.', C: 'O acúmulo pode indicar renovação de ar insuficiente e exige avaliação das condições de ventilação e do lote.' }, c: 'C',
+    f: 'A respiração dos tubérculos libera CO₂. Seu acúmulo pode indicar renovação insuficiente do ar, e concentrações elevadas podem afetar processos fisiológicos dependendo da exposição e das condições de armazenamento.',
+    m: { foto: 'jogo/p10.jpg' } },
 ]
 const FAIXAS = [
-  { ate: 1, nome: 'Atenção aos fundamentos', msg: 'Há pontos básicos do armazenamento que merecem um olhar mais atento. É justamente nesses detalhes invisíveis que a safra se decide.' },
-  { ate: 3, nome: 'Em desenvolvimento', msg: 'Você já enxerga parte do que acontece dentro da câmara. Aprofundar os indicadores certos faz a diferença no resultado do campo.' },
-  { ate: 5, nome: 'Consciência técnica avançada', msg: 'Você reconhece que o armazenamento vai além da temperatura programada. Esse olhar técnico protege o potencial da semente.' },
+  { ate: .2, nome: 'Atenção aos fundamentos', msg: 'Há pontos básicos do armazenamento que merecem um olhar mais atento. É justamente nesses detalhes invisíveis que a safra se decide.' },
+  { ate: .79, nome: 'Em desenvolvimento', msg: 'Você já enxerga parte do que acontece dentro da câmara. Aprofundar os indicadores certos faz a diferença no resultado do campo.' },
+  { ate: 1, nome: 'Consciência técnica avançada', msg: 'Você reconhece que o armazenamento vai além da temperatura programada. Esse olhar técnico protege o potencial da semente.' },
 ]
 const AVISO = 'Esta é uma avaliação educativa das suas respostas. Não é uma auditoria da sua propriedade nem uma medição de produtividade.'
 const WHATSAPP = 'https://wa.me/553491389331?text=' + encodeURIComponent('Olá, Erick! Fiz o Jogo da Safra Invisível da Total Service Farm e quero saber mais.')
@@ -202,7 +222,7 @@ function inicio() {
       <div class="card">
         <p class="rot">Dentro da câmara fria</p>
         <h1 style="margin-top:.5rem">O que acontece com a semente quando ninguém está olhando?</h1>
-        <p class="muted"><b class="gold">5 perguntas rápidas</b> sobre armazenamento de batata-semente. Faça quantas vezes quiser.</p>
+        <p class="muted"><b class="gold">${PERGUNTAS.length} perguntas rápidas</b> sobre armazenamento de batata-semente. Faça quantas vezes quiser.</p>
       </div>
       <button class="btn btn-ouro" id="comecar">Começar</button>
       <p class="tiny" style="color:rgba(245,243,237,.6)">Com som 🔊 · aumente o volume</p>
@@ -269,7 +289,7 @@ function resultado() {
   setFundo('foto')
   app.dataset.q = ''
   const nota = estado.respostas.filter(Boolean).length
-  const faixa = FAIXAS.find((f) => nota <= f.ate)
+  const faixa = FAIXAS.find((f) => nota / PERGUNTAS.length <= f.ate) // proporcional: até 20% · até 79% · 80% ou mais
   const cel = PERGUNTAS.map((_, n) => `<li class="${estado.respostas[n] ? 'ok' : ''}"><span>P${n + 1}</span><b class="${estado.respostas[n] ? '' : 'gold'}">${estado.respostas[n] ? '✓' : '✗'}</b></li>`).join('')
   app.innerHTML = `
     <div class="stack entra">
@@ -289,7 +309,7 @@ function resultado() {
       <p class="tiny">${AVISO}</p>
     </div>`
   let k = 0; const conta = document.getElementById('conta')
-  if (nota > 0) { const t = setInterval(() => { k++; conta.textContent = k; if (k >= nota) { clearInterval(t); if (nota >= 4) somAcerto() } }, 220) }
+  if (nota > 0) { const t = setInterval(() => { k++; conta.textContent = k; if (k >= nota) { clearInterval(t); if (nota / PERGUNTAS.length >= .8) somAcerto() } }, 220) }
   document.getElementById('denovo').onclick = () => { destravar(); estado = { i: 0, respostas: [], escolha: null, respondida: false, efeito: null }; render(); window.scrollTo(0, 0) }
   window.scrollTo(0, 0)
 }
